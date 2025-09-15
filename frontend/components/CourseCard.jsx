@@ -1,3 +1,5 @@
+import Link from 'next/link';
+
 export default function CourseCard({ course }) {
   return (
     <div className="flex flex-col rounded-lg border bg-white p-4 shadow-sm transition hover:shadow">
@@ -7,12 +9,12 @@ export default function CourseCard({ course }) {
         <span>Level: {course.level}</span>
         <span>Duration: {course.duration}</span>
       </div>
-      <button
-        className="mt-4 rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
-        type="button"
+      <Link
+        href={`/courses/${course.id}`}
+        className="mt-4 rounded bg-blue-600 px-4 py-2 text-center text-white hover:bg-blue-700"
       >
         View details
-      </button>
+      </Link>
     </div>
   );
 }
