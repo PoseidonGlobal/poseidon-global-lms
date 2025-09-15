@@ -18,9 +18,8 @@ export default function EnrollForm({ courseId }) {
 
   if (submitted) {
     return (
-      <div className="rounded-md border border-green-200 bg-green-50 p-4 text-green-900">
-        <h3 className="font-medium">Enrollment submitted!</h3>
-        <p className="mt-1 text-sm">Thank you for your interest. We'll contact you soon with next steps.</p>
+      <div className="rounded-md border border-green-200 bg-green-50 p-4 text-green-800">
+        Enrollment submitted for <span className="font-medium">{courseId}</span>. We will contact you shortly.
       </div>
     );
   }
@@ -36,26 +35,26 @@ export default function EnrollForm({ courseId }) {
           value={form.name}
           onChange={(e) => setForm({ ...form, name: e.target.value })}
           required
+          autoComplete="name"
         />
       </div>
-      
       <div>
-        <label className="block text-sm font-medium text-gray-700">Email address</label>
+        <label className="block text-sm font-medium text-gray-700">Email</label>
         <input
           type="email"
           className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2"
           value={form.email}
           onChange={(e) => setForm({ ...form, email: e.target.value })}
           required
+          autoComplete="email"
         />
       </div>
-      
       <button
         type="submit"
         disabled={submitting}
-        className="rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 disabled:opacity-50"
+        className="rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 disabled:opacity-60"
       >
-        {submitting ? 'Submitting...' : 'Submit Enrollment'}
+        {submitting ? 'Submitting…' : 'Submit enrollment'}
       </button>
     </form>
   );
