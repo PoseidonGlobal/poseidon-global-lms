@@ -19,8 +19,7 @@ services:
     environment:
       NEXTAUTH_SECRET: ${NEXTAUTH_SECRET:-dev-secret-change-me}
       NEXTAUTH_URL: http://localhost:3000
-      # Optional if your app uses a DB later; NextAuth with credentials + JWT does not require it
-      DATABASE_URL: ${DATABASE_URL:-}
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/poseidon_lms?schema=public
       NODE_ENV: development
     ports:
       - "3000:3000"
