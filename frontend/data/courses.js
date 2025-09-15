@@ -1,23 +1,38 @@
 export const courses = [
   {
-    id: 'stcw-basic',
-    title: 'STCW Basic Safety Training',
-    summary: 'Foundational safety training for all seafarers.',
+    id: 'basic-gangway-theoretical-training',
+    title: 'Basic Gangway Theoretical Training',
+    summary:
+      'Foundational concepts of gangway operations, safety protocols, and watchstanding.',
     level: 'Beginner',
-    duration: '5 days',
+    duration: '1 day',
+    status: 'available',
   },
   {
-    id: 'gmdss',
-    title: 'GMDSS Radio Operator',
-    summary: 'Operate GMDSS equipment and procedures.',
+    id: 'comprehensive-theoretical-maritime-security-training',
+    title: 'Comprehensive Theoretical Maritime Security Training',
+    summary:
+      'In-depth theoretical coverage of ISPS, risk assessment, and security procedures.',
     level: 'Intermediate',
-    duration: '10 days',
+    duration: '3 days',
+    status: 'available',
   },
   {
-    id: 'dp-induction',
-    title: 'Dynamic Positioning (DP) Induction',
-    summary: 'Introduction to DP systems and operations.',
-    level: 'Intermediate',
-    duration: '4 days',
+    id: 'cvssa-cruise-vessel-safety-and-security-act',
+    title: 'Cruise Vessel Safety and Security Act (CVSSA)',
+    summary:
+      'Course content is in development. Please check back soon.',
+    level: 'N/A',
+    duration: 'TBD',
+    status: 'coming_soon',
+  },
+  {
+    id: 'investigations-for-beginners',
+    title: 'Investigations for Beginners',
+    summary:
+      'Introductory investigation methods, evidence handling, and reporting.',
+    level: 'Beginner',
+    duration: 'TBD',
+    status: 'coming_soon',
   },
 ];

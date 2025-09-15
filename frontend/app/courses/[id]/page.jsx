@@ -7,6 +7,8 @@ export default function CoursePage({ params }) {
   const course = courses.find((c) => c.id === params.id);
   if (!course) return notFound();
 
+  const comingSoon = course.status === 'coming_soon';
+
   return (
     <main className="mx-auto max-w-3xl px-4 py-8">
       <nav className="mb-4 text-sm text-gray-600">
@@ -21,7 +23,15 @@ export default function CoursePage({ params }) {
         <div><span className="font-medium text-gray-800">Duration:</span> {course.duration}</div>
       </div>
 
-      <EnrollForm courseId={course.id} />
+      {comingSoon ? (
+        <div className="mt-6 rounded-md border border-amber-200 bg-amber-50 p-4 text-amber-900">
+          This course is coming soon. Enrollment is not yet available.
+        </div>
+      ) : (
+        <div className="mt-6">
+          <EnrollForm courseId={course.id} />
+        </div>
+      )}
     </main>
   );
 }
