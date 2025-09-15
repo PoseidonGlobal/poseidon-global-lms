@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { courses } from '../../../../data/courses';
-import EnrollForm from '../../../../components/EnrollForm';
+import { courses } from '../../../data/courses';
+import EnrollForm from '../../../components/EnrollForm';
 
 export default function CoursePage({ params }) {
   const course = courses.find((c) => c.id === params.id);
