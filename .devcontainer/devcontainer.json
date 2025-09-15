@@ -1,0 +1,23 @@
+{
+  "name": "Poseidon Global LMS",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:20",
+  "features": {
+    "ghcr.io/devcontainers/features/git:1": {}
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "bradlc.vscode-tailwindcss",
+        "GitHub.copilot",
+        "GitHub.copilot-chat"
+      ]
+    }
+  },
+  "postCreateCommand": "cd frontend && (npm ci || npm install)",
+  "portsAttributes": {
+    "3000": { "label": "Next.js", "onAutoForward": "openBrowser" }
+  },
+  "forwardPorts": [3000]
+}
