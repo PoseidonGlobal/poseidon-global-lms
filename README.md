@@ -1,12 +1,15 @@
 # Poseidon Global Maritime University LMS
 
-![Poseidon Global Logo](./frontend/public/logo.png)
+Place your logo at: `frontend/public/logo.png` and keep the same filename to use the reference below.
 
-**Bringing maritime security courses alive and to persons who have never worked at sea, allowing them a glimpse and opportunity to achieve greatness with information before embarkation—making the transitions smoother than ever.**
+![Poseidon Global Logo](./frontend/public/logo.png)
 
 ## Founders
 - **Chief Security Officer**: Kaeleigh Woodward
 - **Partner**: [Add partner's name here]
+
+## Mission Statement
+**Bringing maritime security courses alive and to persons who have never worked at sea, allowing them a glimpse and opportunity to achieve greatness with information before embarkation—making the transitions smoother than ever.**
 
 ---
 
@@ -40,7 +43,20 @@ git --version
 
 ---
 
-## Quick Start
+## Getting Started (Docker)
+
+1) Add your logo to `frontend/public/logo.png` (optional).
+2) Build and run:
+```bash
+docker-compose up --build
+```
+3) Access:
+- Frontend: http://localhost:3000
+- Backend API: http://localhost:4000/health
+
+---
+
+## Local Development (MonoRepo)
 
 ### 1. Clone and Setup
 
@@ -121,19 +137,25 @@ npm run format        # Format frontend code
 
 ---
 
-## Project Structure
+## Individual Component Development (without MonoRepo scripts)
 
+### Backend:
+```bash
+cd backend
+npm install
+npm run dev
 ```
-poseidon-global-lms/
-├── .github/
-│   └── workflows/
-│       └── node-ci.yml          # GitHub Actions CI
-├── .vscode/
-│   ├── settings.json            # VS Code settings
-│   └── extensions.json          # Recommended extensions
-├── backend/
-│   ├── src/
-│   │   └── index.js            # Express server
+http://localhost:4000/health
+
+### Frontend:
+```bash
+cd frontend
+npm install
+npm run dev
+```
+http://localhost:3000
+
+---
 │   ├── .env.example            # Backend environment template
 │   ├── .eslintrc.json          # Backend ESLint config
 │   ├── .prettierrc             # Backend Prettier config
@@ -299,3 +321,35 @@ npm run format  # Format all code
 ## License
 
 © 2024 Poseidon Global Maritime University. All rights reserved.
+=======
+## Getting Started (Docker)
+
+1) Add your logo to `frontend/public/logo.png` (optional).
+2) Build and run:
+```bash
+docker-compose up --build
+```
+3) Access:
+- Frontend: http://localhost:3000
+- Backend API: http://localhost:5000/health
+
+---
+
+## Local development without Docker
+
+- Backend:
+  ```bash
+  cd backend
+  npm install
+  npm run dev
+  ```
+  http://localhost:5000/health
+
+- Frontend:
+  ```bash
+  cd frontend
+  npm install
+  npm run dev
+  ```
+  http://localhost:3000
+>>>>>>> main

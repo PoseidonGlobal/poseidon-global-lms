@@ -1,7 +1,10 @@
 import Credentials from 'next-auth/providers/credentials';
-import { demoUsers } from './demoUsers';
+import { PrismaAdapter } from '@auth/prisma-adapter';
+import { prisma } from './prisma';
+import bcrypt from 'bcryptjs';
 
 export const authOptions = {
+  adapter: PrismaAdapter(prisma),
   session: { strategy: 'jwt' },
   providers: [
     Credentials({
@@ -11,10 +14,11 @@ export const authOptions = {
         password: { label: 'Password', type: 'password' },
       },
       async authorize(credentials) {
-        const user = demoUsers.find(
-          (u) => u.email === credentials?.email && u.password === credentials?.password
-        );
-        if (!user) return null;
+        if (!credentials?.email || !credentials?.password) return null;
+        const user = await prisma.user.findUnique({ where: { email: credentials.email } });
+        if (!user || !user.passwordHash) return null;
+        const ok = await bcrypt.compare(credentials.password, user.passwordHash);
+        if (!ok) return null;
         return {
           id: user.id,
           name: user.name,
@@ -34,7 +38,7 @@ export const authOptions = {
       return token;
     },
     async session({ session, token }) {
-      if (token) {
+      if (token && session.user) {
         session.user.role = token.role;
         session.user.username = token.username;
       }
