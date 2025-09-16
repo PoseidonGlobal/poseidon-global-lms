@@ -1,0 +1,19 @@
+# Node/Next.js
+node_modules
+.next
+out
+
+# Env files
+.env
+.env.*
+!.env.example
+!.env.local.example
+
+# Prisma
+prisma/*.db
+prisma/*.sqlite
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
