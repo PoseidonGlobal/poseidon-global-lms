@@ -70,7 +70,7 @@ export default function LoginPage() {
           {loading ? 'Signing in...' : 'Log in'}
         </button>
         <p className="text-sm text-gray-600">
-          Demo accounts: student1@example.com / password123, admin@example.com / admin1234
+          Demo accounts (seeded in Postgres): student1@example.com / password123, admin@example.com / admin1234
         </p>
       </form>
     </main>

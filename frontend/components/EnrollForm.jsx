@@ -3,79 +3,59 @@
 import { useState } from 'react';
 
 export default function EnrollForm({ courseId }) {
-  const [status, setStatus] = useState('idle');
-  const [form, setForm] = useState({ name: '', email: '', note: '' });
+  const [form, setForm] = useState({ name: '', email: '' });
+  const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
 
-  function handleChange(e) {
-    const { name, value } = e.target;
-    setForm((f) => ({ ...f, [name]: value }));
+  async function onSubmit(e) {
+    e.preventDefault();
+    setSubmitting(true);
+    // Placeholder: in future, POST to backend API using NEXT_PUBLIC_API_BASE_URL
+    await new Promise((r) => setTimeout(r, 600));
+    setSubmitting(false);
+    setSubmitted(true);
   }
 
-  async function handleSubmit(e) {
-    e.preventDefault();
-    setStatus('submitting');
-    try {
-      // Placeholder submit. Replace with your API call.
-      await new Promise((r) => setTimeout(r, 700));
-      setStatus('success');
-    } catch (err) {
-      console.error(err);
-      setStatus('error');
-    }
+  if (submitted) {
+    return (
+      <div className="rounded-md border border-green-200 bg-green-50 p-4 text-green-800">
+        Enrollment submitted for <span className="font-medium">{courseId}</span>. We will contact you shortly.
+      </div>
+    );
   }
 
   return (
-    <form onSubmit={handleSubmit} className="mt-6 space-y-4 rounded-lg border p-4">
-      <h4 className="text-base font-semibold">Enroll in this course</h4>
-      <input type="hidden" name="courseId" value={courseId} />
+    <form onSubmit={onSubmit} className="mt-6 space-y-4">
+      <h2 className="text-lg font-semibold">Enroll in this course</h2>
       <div>
-        <label className="block text-sm font-medium text-gray-700" htmlFor="name">Full name</label>
+        <label className="block text-sm font-medium text-gray-700">Full name</label>
         <input
-          id="name"
-          name="name"
+          type="text"
+          className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2"
           value={form.name}
-          onChange={handleChange}
+          onChange={(e) => setForm({ ...form, name: e.target.value })}
           required
-          className="mt-1 w-full rounded border px-3 py-2 outline-none focus:border-blue-600"
-          placeholder="Jane Doe"
+          autoComplete="name"
         />
       </div>
       <div>
-        <label className="block text-sm font-medium text-gray-700" htmlFor="email">Email</label>
+        <label className="block text-sm font-medium text-gray-700">Email</label>
         <input
-          id="email"
           type="email"
-          name="email"
+          className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2"
           value={form.email}
-          onChange={handleChange}
+          onChange={(e) => setForm({ ...form, email: e.target.value })}
           required
-          className="mt-1 w-full rounded border px-3 py-2 outline-none focus:border-blue-600"
-          placeholder="jane@example.com"
+          autoComplete="email"
         />
       </div>
-      <div>
-        <label className="block text-sm font-medium text-gray-700" htmlFor="note">Note (optional)</label>
-        <textarea
-          id="note"
-          name="note"
-          value={form.note}
-          onChange={handleChange}
-          rows={3}
-          className="mt-1 w-full rounded border px-3 py-2 outline-none focus:border-blue-600"
-          placeholder="Anything we should know?"
-        />
-      </div>
-      <div className="flex items-center gap-3">
-        <button
-          type="submit"
-          disabled={status === 'submitting'}
-          className="rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 disabled:opacity-60"
-        >
-          {status === 'submitting' ? 'Submitting…' : 'Enroll'}
-        </button>
-        {status === 'success' && <span className="text-green-700">Enrollment request submitted!</span>}
-        {status === 'error' && <span className="text-red-700">Something went wrong. Try again.</span>}
-      </div>
+      <button
+        type="submit"
+        disabled={submitting}
+        className="rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 disabled:opacity-60"
+      >
+        {submitting ? 'Submitting…' : 'Submit enrollment'}
+      </button>
     </form>
   );
 }

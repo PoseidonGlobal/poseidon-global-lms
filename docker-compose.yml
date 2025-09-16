@@ -1,24 +1,46 @@
 version: "3.9"
 
 services:
+  db:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: poseidon_lms
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
   backend:
     build: ./backend
     ports:
-      - "5000:5000"
+      - "4000:4000"
     environment:
       - NODE_ENV=development
     volumes:
       - ./backend:/app
       - /app/node_modules
+    depends_on:
+      - db
+
   frontend:
-    build: ./frontend
+    build:
+      context: ./frontend
+    command: ["sh", "./scripts/docker-entrypoint.sh"]
+    environment:
+      NEXTAUTH_SECRET: ${NEXTAUTH_SECRET:-dev-secret-change-me}
+      NEXTAUTH_URL: http://localhost:3000
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/poseidon_lms?schema=public
+      NODE_ENV: development
     ports:
       - "3000:3000"
-    environment:
-      - VITE_API_BASE_URL=http://localhost:5000
-      - CHOKIDAR_USEPOLLING=true
-    depends_on:
-      - backend
     volumes:
       - ./frontend:/app
       - /app/node_modules
+    depends_on:
+      - db
+
+volumes:
+  postgres-data:
