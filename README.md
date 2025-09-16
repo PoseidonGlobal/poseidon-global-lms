@@ -287,6 +287,59 @@ npm run format  # Format all code
 
 ---
 
+## Backups (macOS/Linux)
+
+You can create local backups of this repository as:
+- A ZIP snapshot (fast copy of files, excluding build/dependency folders)
+- A Git bundle (a single file containing the entire Git history and refs; can be cloned without network access)
+
+### Quick start
+
+Create both ZIP and bundle in the parent folder of the repo (../):
+
+```bash
+npm run backup
+```
+
+Only ZIP or only bundle:
+
+```bash
+npm run backup:zip
+npm run backup:bundle
+```
+
+Choose a custom destination (e.g., your Backups folder):
+
+```bash
+npm run backup -- --dest "$HOME/Backups"
+```
+
+Artifacts created (examples):
+- ZIP:    ../poseidon-global-lms-backup-YYYY-MM-DD.zip
+- Bundle: ../poseidon-global-lms-YYYY-MM-DD.bundle
+
+### Restore from bundle
+
+Use the helper script to restore into a new directory:
+
+```bash
+bash scripts/restore-from-bundle.sh ../poseidon-global-lms-YYYY-MM-DD.bundle ~/Desktop/poseidon-restore
+```
+
+If you omit the second argument, the script will create a folder based on the bundle name.
+
+### Optional: copy to an external drive (macOS)
+
+Replace `YourDrive` with your drive name in Finder:
+
+```bash
+rsync -a --exclude=node_modules --exclude=.next --exclude=backend/node_modules \
+  --exclude=frontend/node_modules --exclude=.turbo --exclude=dist --exclude=.vercel \
+  ./ /Volumes/YourDrive/poseidon-global-lms/
+```
+
+---
+
 ## Troubleshooting
 
 ### Backend Not Starting

@@ -15,7 +15,10 @@
     "backend:lint": "cd backend && npm run lint",
     "backend:format": "cd backend && npm run format",
     "frontend:lint": "cd frontend && npm run lint",
-    "frontend:format": "cd frontend && npm run format"
+    "frontend:format": "cd frontend && npm run format",
+    "backup:zip": "bash scripts/backup.sh zip",
+    "backup:bundle": "bash scripts/backup.sh bundle",
+    "backup": "bash scripts/backup.sh both"
   },
   "workspaces": [
     "backend",
