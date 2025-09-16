@@ -1,0 +1,31 @@
+{
+  "name": "poseidon-global-lms",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Poseidon Global Maritime University LMS - MonoRepo",
+  "scripts": {
+    "dev": "concurrently \"npm run backend:dev\" \"npm run frontend:dev\"",
+    "frontend:dev": "cd frontend && npm run dev",
+    "backend:dev": "cd backend && npm run dev",
+    "frontend:build": "cd frontend && npm run build",
+    "backend:start": "cd backend && npm run start",
+    "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install",
+    "lint": "npm run backend:lint && npm run frontend:lint",
+    "format": "npm run backend:format && npm run frontend:format",
+    "backend:lint": "cd backend && npm run lint",
+    "backend:format": "cd backend && npm run format",
+    "frontend:lint": "cd frontend && npm run lint",
+    "frontend:format": "cd frontend && npm run format"
+  },
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "engines": {
+    "node": ">=18.17.0",
+    "npm": ">=9.0.0"
+  }
+}

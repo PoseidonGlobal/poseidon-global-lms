@@ -1,17 +1,25 @@
 {
-  "name": "Poseidon LMS Dev",
+  "name": "Poseidon Global LMS",
   "dockerComposeFile": ["../docker-compose.yml"],
   "service": "frontend",
   "workspaceFolder": "/app",
-  "forwardPorts": [3000, 5432],
+  "forwardPorts": [3000, 4000, 5432],
+  "portsAttributes": {
+    "3000": { "label": "Frontend (Next.js)", "onAutoForward": "openBrowser" },
+    "4000": { "label": "Backend API" },
+    "5432": { "label": "PostgreSQL" }
+  },
   "postCreateCommand": "npm install && npx prisma generate",
   "customizations": {
     "vscode": {
       "extensions": [
-        "esbenp.prettier-vscode",
         "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "bradlc.vscode-tailwindcss",
         "Prisma.prisma",
         "ms-azuretools.vscode-docker",
+        "GitHub.copilot",
+        "GitHub.copilot-chat",
         "github.vscode-pull-request-github"
       ],
       "settings": {
