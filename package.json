@@ -4,18 +4,20 @@
   "private": true,
   "description": "Poseidon Global Maritime University LMS - MonoRepo",
   "scripts": {
-    "dev": "concurrently \"npm run backend:dev\" \"npm run frontend:dev\"",
+    "dev": "concurrently \"npm:dev:backend\" \"npm:dev:frontend\"",
     "frontend:dev": "cd frontend && npm run dev",
     "backend:dev": "cd backend && npm run dev",
     "frontend:build": "cd frontend && npm run build",
     "backend:start": "cd backend && npm run start",
-    "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install",
+    "install:all": "npm --prefix backend install && npm --prefix frontend install",
     "lint": "npm run backend:lint && npm run frontend:lint",
     "format": "npm run backend:format && npm run frontend:format",
     "backend:lint": "cd backend && npm run lint",
     "backend:format": "cd backend && npm run format",
     "frontend:lint": "cd frontend && npm run lint",
-    "frontend:format": "cd frontend && npm run format"
+    "frontend:format": "cd frontend && npm run format",
+    "dev:backend": "npm --prefix backend run dev",
+    "dev:frontend": "npm --prefix frontend run dev"
   },
   "workspaces": [
     "backend",

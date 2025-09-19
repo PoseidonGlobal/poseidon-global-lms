@@ -1,24 +1,16 @@
 FROM node:20-alpine
-
 WORKDIR /app
 
-# Helpful utilities for entrypoint
+# System tools (openssl/netcat used by some scripts or health checks)
 RUN apk add --no-cache openssl netcat-openbsd
 
-# Install dependencies first (cache friendly)
+# Install deps (copy only manifests first for caching)
 COPY package.json package-lock.json* pnpm-lock.yaml* yarn.lock* ./
-RUN if [ -f package-lock.json ]; then npm ci; \
-    elif [ -f yarn.lock ]; then yarn install --frozen-lockfile; \
-    elif [ -f pnpm-lock.yaml ]; then corepack enable && pnpm i --frozen-lockfile; \
-    else npm install; fi
+RUN npm install --legacy-peer-deps
 
-# Copy app source
+# App source
 COPY . .
 
-# Ensure entrypoint is executable
-RUN chmod +x scripts/docker-entrypoint.sh
-
 EXPOSE 3000
-
-# Start via entrypoint
-CMD ["sh", "./scripts/docker-entrypoint.sh"]
+ENV NODE_ENV=development
+CMD ["npm","run","dev"]
