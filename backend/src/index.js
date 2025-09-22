@@ -9,14 +9,9 @@ const PORT = process.env.PORT || 4000;
 app.use(cors());
 app.use(express.json());
 
-// Health check endpoint
-app.get('/healthz', (req, res) => {
-  res.json({
-    status: 'ok',
-    uptime: process.uptime(),
-    timestamp: new Date().toISOString(),
-  });
-});
+// Health check endpoints
+app.get('/health', (_req, res) => res.json({ status: 'ok' }));
+app.get('/healthz', (_req, res) => res.json({ status: 'ok' }));
 
 // API routes
 app.get('/api/v1/hello', (req, res) => {
