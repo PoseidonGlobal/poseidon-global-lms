@@ -1,9 +1,10 @@
 import { getServerSession } from 'next-auth';
 import { notFound } from 'next/navigation';
 import { authOptions } from '../../../lib/auth';
+import { auth } from '@/auth';
 
-export default async function StudentProfilePage({ params }) {
-  const session = await getServerSession(authOptions);
+export default async function StudentUserPage({ params }) {
+  const session = await auth();
   if (!session) {
     notFound();
   }
@@ -14,7 +15,9 @@ export default async function StudentProfilePage({ params }) {
     return (
       <main className="mx-auto max-w-3xl px-4 py-8">
         <h1 className="text-xl font-semibold text-red-700">Access denied</h1>
-        <p className="mt-2 text-gray-700">You are not authorized to view this page.</p>
+        <p className="mt-2 text-gray-700">
+          You are not authorized to view this page.
+        </p>
       </main>
     );
   }
@@ -22,7 +25,9 @@ export default async function StudentProfilePage({ params }) {
   return (
     <main className="mx-auto max-w-3xl px-4 py-8">
       <h1 className="text-2xl font-bold">Student: {username}</h1>
-      <p className="mt-2 text-gray-700">This page will show your enrollments and course progress.</p>
+      <p className="mt-2 text-gray-700">
+        This page will show your enrollments and course progress.
+      </p>
     </main>
   );
 }

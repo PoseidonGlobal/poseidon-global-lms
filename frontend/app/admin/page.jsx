@@ -1,15 +1,20 @@
 import { getServerSession } from 'next-auth';
 import { redirect } from 'next/navigation';
 import { authOptions } from '../../lib/auth';
+import { auth } from '@/auth';
 
 export default async function AdminPage() {
-  const session = await getServerSession(authOptions);
+  const session = await auth();
   if (!session) redirect('/login');
   if (session.user.role !== 'admin') {
     return (
       <main className="mx-auto max-w-3xl px-4 py-8">
-        <h1 className="text-xl font-semibold text-red-700">Admin access required</h1>
-        <p className="mt-2 text-gray-700">You do not have permission to view this page.</p>
+        <h1 className="text-xl font-semibold text-red-700">
+          Admin access required
+        </h1>
+        <p className="mt-2 text-gray-700">
+          You do not have permission to view this page.
+        </p>
       </main>
     );
   }
