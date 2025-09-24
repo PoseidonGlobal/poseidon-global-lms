@@ -1,8 +1,18 @@
-FROM node:20-alpine
+# ---- Dependencies/build layer ----
+FROM node:20-alpine AS deps
 WORKDIR /app
-COPY package*.json ./
-RUN npm install --omit=dev
-COPY . .
 ENV NODE_ENV=production
+COPY package*.json ./
+RUN --mount=type=cache,target=/root/.npm npm ci --omit=dev
+
+# ---- Runtime layer ----
+FROM node:20-alpine AS runtime
+WORKDIR /app
+ENV NODE_ENV=production
+RUN addgroup -S nodegrp && adduser -S nodeuser -G nodegrp
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
 EXPOSE 4000
+HEALTHCHECK --interval=30s --timeout=3s --retries=3 CMD wget -qO- http://127.0.0.1:4000/healthz || exit 1
+USER nodeuser
 CMD ["node","src/index.js"]

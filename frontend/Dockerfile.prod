@@ -1,23 +1,288 @@
-FROM node:20-alpine AS deps
+# ---- Builder ----
+FROM node:20-alpine AS builder
 WORKDIR /app
-COPY package*.json ./
-# Lockfile may not be committed; allow peers for Auth v5 beta
-RUN npm install --legacy-peer-deps
-
-FROM node:20-alpine AS build
-WORKDIR /app
-COPY --from=deps /app/node_modules node_modules
-COPY . .
+ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
+COPY package*.json ./
+# Use lockfile if present; otherwise install with peer deps tolerated
+RUN --mount=type=cache,target=/root/.npm sh -c 'if [ -f package-lock.json ]; then npm ci; else npm install --legacy-peer-deps; fi'
+COPY . .
 RUN npm run build
 
+# ---- Runner (minimal) ----
 FROM node:20-alpine AS runner
 WORKDIR /app
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
-COPY --from=deps /app/node_modules node_modules
-COPY --from=build /app/.next .next
-COPY --from=build /app/public public
-COPY package*.json ./
+# Non-root user
+RUN addgroup -S nodegrp && adduser -S nodeuser -G nodegrp
+# Copy standalone output
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/.next/static ./.next/static
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/package*.json ./
 EXPOSE 3000
-CMD ["npm","run","start"]
+USER nodeuser
+HEALTHCHECK --interval=30s --timeout=3s --retries=3 CMD wget -qO- http://127.0.0.1:3000/ || exit 1
+CMD ["node", "server.js"]
+
+volumes:
+  postgres-data:
+
+services:
+  db:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: poseidon_lms
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d poseidon_lms"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build: ./backend
+    ports:
+      - "4000:4000"
+    environment:
+      - NODE_ENV=development
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    depends_on:
+      - db
+    container_name: lms_backend
+    restart: unless-stopped
+    env_file:
+      - backend/.env
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:4000/healthz || exit 1"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+
+  frontend:
+    build:
+      context: ./frontend
+    command: ["sh", "./scripts/docker-entrypoint.sh"]
+    environment:
+      NEXTAUTH_SECRET: ${NEXTAUTH_SECRET:-dev-secret-change-me}
+      NEXTAUTH_URL: http://localhost:3000
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/poseidon_lms?schema=public
+      NODE_ENV: development
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    depends_on:
+      - db
+    container_name: lms_frontend
+    restart: unless-stopped
+    env_file:
+      - frontend/.env
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:3000/ || exit 1"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+
+// filepath: /Users/kaeleighwoodward/Desktop/Poseidon/poseidon-global-lms/frontend/.env.example
+NODE_ENV=production
+PORT=3000
+NEXTAUTH_URL=http://localhost:3000
+NEXTAUTH_SECRET=replace_with_strong_secret
+DATABASE_URL=postgresql://postgres:postgres@db:5432/poseidon_lms?schema=public
+
+// filepath: /Users/kaeleighwoodward/Desktop/Poseidon/poseidon-global-lms/.dockerignore
+.git
+**/node_modules
+npm-debug.log*
+.gitignore
+.env
+.env.*
+coverage
+logs
+Dockerfile*
+.dockerignore
+
+// filepath: /Users/kaeleighwoodward/Desktop/Poseidon/poseidon-global-lms/backend/.dockerignore
+node_modules
+npm-debug.log*
+.git
+.gitignore
+.env
+.env.*
+coverage
+logs
+Dockerfile*
+.dockerignore
+
+// filepath: /Users/kaeleighwoodward/Desktop/Poseidon/poseidon-global-lms/frontend/.dockerignore
+node_modules
+npm-debug.log*
+.next
+out
+.git
+.gitignore
+.env
+.env.*
+coverage
+logs
+Dockerfile*
+.dockerignore
+
+// filepath: /Users/kaeleighwoodward/Desktop/Poseidon/poseidon-global-lms/.github/workflows/ci.yml
+name: CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    name: Backend (Express)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+      - run: npm ci
+      - run: npm run lint || true
+      - run: npm run start --silent &
+      - run: |
+          for i in {1..20}; do curl -fsS http://localhost:4000/healthz && break || sleep 2; done
+      - run: pkill -f "node src/index.js" || true
+
+  frontend:
+    name: Frontend (Next.js)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - run: npm run build
+      - run: npm run lint || true
+
+  docker-build:
+    name: Docker build (no push)
+    needs: [backend, frontend]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Build backend image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./backend
+          file: ./backend/Dockerfile.prod
+          push: false
+          tags: poseidon-global/lms-backend:ci
+      - name: Build frontend image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./frontend
+          file: ./frontend/Dockerfile.prod
+          push: false
+          tags: poseidon-global/lms-frontend:ci
+
+// filepath: /Users/kaeleighwoodward/Desktop/Poseidon/poseidon-global-lms/README.md
+# Poseidon Global LMS
+
+This repo contains dev containers (docker-compose.yml) and production containers (docker-compose.prod.yml).
+
+## Dev
+
+```bash
+docker compose up -d
+```
+
+- Frontend: http://localhost:3000
+- Backend:  http://localhost:4000/healthz
+
+## Production
+
+1) Prepare environment
+
+```bash
+cp backend/.env.example backend/.env
+cp frontend/.env.example frontend/.env
+```
+
+Adjust secrets:
+- backend/.env: DATABASE_URL, CORS_ORIGIN
+- frontend/.env: NEXTAUTH_SECRET, DATABASE_URL, NEXTAUTH_URL
+
+2) Build and run
+
+```bash
+docker compose -f docker-compose.prod.yml build --pull
+docker compose -f docker-compose.prod.yml up -d
+docker compose -f docker-compose.prod.yml ps
+docker compose -f docker-compose.prod.yml logs -f
+```
+
+Health:
+- Backend: http://127.0.0.1:4000/healthz
+- Frontend: http://127.0.0.1:3000/
+
+3) Prisma (run in frontend)
+
+```bash
+docker compose -f docker-compose.prod.yml exec frontend npx prisma migrate deploy
+docker compose -f docker-compose.prod.yml exec frontend npm run prisma:seed || true
+```
+
+## Nginx reverse proxy (example)
+
+```nginx
+server {
+  listen 80;
+  server_name your.domain;
+
+  location /api/ {
+    proxy_pass http://127.0.0.1:4000/;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+  }
+
+  location / {
+    proxy_pass http://127.0.0.1:3000/;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+  }
+}
