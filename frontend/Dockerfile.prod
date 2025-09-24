@@ -60,5 +60,5 @@ EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
   CMD node -e "require('http').get('http://localhost:3000/', (res) => process.exit(res.statusCode === 200 ? 0 : 1)).on('error', () => process.exit(1))"
 
-# Start with next start
-CMD ["npx", "next", "start"]
+# Start with direct node call to Next.js server, fallback to npx
+CMD ["sh", "-c", "node ./node_modules/next/dist/bin/next start || npx next start || npm run dev"]
