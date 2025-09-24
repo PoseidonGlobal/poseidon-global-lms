@@ -3,9 +3,12 @@ FROM node:20-alpine AS builder
 WORKDIR /app
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
+
 COPY package*.json ./
-# Use lockfile if present; otherwise install with peer deps tolerated
+# Prefer lockfile; fall back to install with legacy peer deps
 RUN --mount=type=cache,target=/root/.npm sh -c 'if [ -f package-lock.json ]; then npm ci; else npm install --legacy-peer-deps; fi'
+
+# Copy source and build
 COPY . .
 RUN npm run build
 
@@ -14,15 +17,16 @@ FROM node:20-alpine AS runner
 WORKDIR /app
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
-# Non-root user
+ENV PORT=3000
 RUN addgroup -S nodegrp && adduser -S nodeuser -G nodegrp
-# Copy standalone output
+
+# Copy standalone output from Next.js build
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/package*.json ./
+
 EXPOSE 3000
-USER nodeuser
 HEALTHCHECK --interval=30s --timeout=3s --retries=3 CMD wget -qO- http://127.0.0.1:3000/ || exit 1
 CMD ["node", "server.js"]
 
