@@ -13,7 +13,7 @@ export default function AboutPage() {
       </p>
       <h2>Our Mission</h2>
       <p>Bringing maritime security courses alive with practical, scenario-based learning.</p>
-      <h2>What’s next</h2>
+      <h2>What&apos;s next</h2>
       <ul>
         <li>Interactive labs and assessments</li>
         <li>Progress tracking and certifications</li>
