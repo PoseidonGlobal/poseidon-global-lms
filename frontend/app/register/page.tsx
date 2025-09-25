@@ -6,7 +6,7 @@ export default function RegisterPage() {
   const [form, setForm] = useState({ name: '', email: '', password: '' });
   const [submitted, setSubmitted] = useState(false);
 
-  function onSubmit(e) {
+  function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     // Placeholder: replace with a real registration API + database.
     setSubmitted(true);
