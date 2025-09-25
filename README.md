@@ -30,13 +30,13 @@ Place your logo at: `frontend/public/logo.png` and keep the same filename to use
 
 Before you begin, ensure you have the following installed:
 
-- **Node.js** 18+ (LTS recommended)
+- **Node.js** 20+ (LTS recommended)
 - **npm** 9.0.0+
 - **Git**
 
 You can verify your versions:
 ```bash
-node --version  # Should be 18.17.0 or higher
+node --version  # Should be 20.0.0 or higher
 npm --version   # Should be 9.0.0 or higher
 git --version
 ```
@@ -292,7 +292,7 @@ npm run format  # Format all code
 ### Backend Not Starting
 - Ensure port 4000 is available
 - Check backend/.env file exists
-- Verify Node.js version (18+)
+- Verify Node.js version (20+)
 
 ### Frontend Not Starting
 - Ensure port 3000 is available
