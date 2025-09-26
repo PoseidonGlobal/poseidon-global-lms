@@ -1,4 +1,5 @@
 import './globals.css';
+import SessionProvider from '../components/SessionProvider';
 
 export const metadata = {
   title: 'Poseidon Global Maritime University LMS',
@@ -8,7 +9,9 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className="antialiased font-sans">{children}</body>
+      <body className="antialiased font-sans">
+        <SessionProvider>{children}</SessionProvider>
+      </body>
     </html>
   );
 }
