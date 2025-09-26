@@ -1,4 +1,4 @@
-import NextAuth, { auth as nextAuth } from 'next-auth';
+import NextAuth from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
 import { PrismaAdapter } from '@auth/prisma-adapter';
 import { PrismaClient } from '@prisma/client';
@@ -6,7 +6,7 @@ import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
 
-export const authOptions = {
+const authOptions = {
   adapter: PrismaAdapter(prisma),
   session: { strategy: 'jwt' },
   providers: [
@@ -31,5 +31,5 @@ export const authOptions = {
 
 const handler = NextAuth(authOptions);
 
-// Export only once!
-export { handler as GET, handler as POST, nextAuth as auth, authOptions };
+// Only export route handlers!
+export { handler as GET, handler as POST };
