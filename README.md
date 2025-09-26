@@ -14,6 +14,12 @@ Place your logo at: `frontend/public/logo.png` and keep the same filename to use
 ---
 
 ## Features
+- **Authentication & Security**
+  - User registration with email validation and secure password requirements
+  - JWT-based authentication with NextAuth.js integration
+  - Session management with automatic login/logout UI updates
+  - Protected routes with role-based access control (admin/student)
+  - Backend API protection with JWT middleware
 - Modular courses with quizzes and final exams, delivered in slideshow format
 - Personal student dashboard (track progress, courses, certificates)
 - Admin dashboard for founders (student tracking, analytics, feedback)
@@ -83,8 +89,26 @@ cp frontend/.env.local.example frontend/.env.local
 
 **Environment Files:**
 - `.env` - Root environment variables
-- `backend/.env` - Backend configuration (PORT=4000)
-- `frontend/.env.local` - Frontend configuration (NEXT_PUBLIC_API_BASE_URL=http://localhost:4000)
+- `backend/.env` - Backend configuration (PORT=4000, NEXTAUTH_SECRET)
+- `frontend/.env.local` - Frontend configuration (NEXTAUTH_SECRET, DATABASE_URL)
+
+**Required Environment Variables:**
+
+For Frontend (`frontend/.env.local`):
+```bash
+NEXTAUTH_SECRET=4f8c0b3a2d7e1f9a8b6c5d4e3f2a1b0c9d8e7f6a5b4c3d2e1f0a9b8c7d6e5f4
+DATABASE_URL=file:./dev.db
+NEXTAUTH_URL=http://localhost:3000
+```
+
+For Backend (`backend/.env`):
+```bash
+PORT=4000
+NODE_ENV=development
+NEXTAUTH_SECRET=4f8c0b3a2d7e1f9a8b6c5d4e3f2a1b0c9d8e7f6a5b4c3d2e1f0a9b8c7d6e5f4
+```
+
+⚠️ **Important**: Make sure the `NEXTAUTH_SECRET` is the same in both files for JWT authentication to work properly.
 
 ### 3. Start Development Servers
 
@@ -197,6 +221,72 @@ http://localhost:3000
     "message": "Hello from LMS backend"
   }
   ```
+
+- **GET /api/v1/protected** - Protected route (requires JWT)
+  ```bash
+  # Request with Authorization header
+  curl -H "Authorization: Bearer <jwt_token>" http://localhost:4000/api/v1/protected
+  ```
+
+- **GET /api/v1/validate-token** - Token validation endpoint
+  ```json
+  {
+    "valid": true,
+    "user": {
+      "sub": "1",
+      "name": "Test User",
+      "email": "test@example.com",
+      "role": "student"
+    }
+  }
+  ```
+
+### Frontend (http://localhost:3000)
+
+- **POST /api/register** - User registration endpoint
+- **GET/POST /api/auth/[...nextauth]** - NextAuth authentication endpoints
+
+---
+
+## Authentication System
+
+### Features
+- **User Registration**: Secure account creation with validation
+- **JWT Authentication**: Token-based authentication for API access
+- **Session Management**: Persistent login state across page refreshes
+- **Role-based Access**: Admin and student role differentiation
+- **Protected Routes**: Automatic redirects for unauthorized access
+
+### Demo Accounts
+```
+Admin: admin@example.com / admin1234
+Student: student1@example.com / password123
+```
+
+### Registration Flow
+1. Navigate to http://localhost:3000/register
+2. Fill out the form with name, email, and password (8+ characters)
+3. System creates account with automatic username generation
+4. Redirect to login page
+5. Use new credentials to log in
+
+### Backend JWT Usage
+```javascript
+// Generate token (done automatically by NextAuth)
+const token = jwt.sign(userPayload, process.env.NEXTAUTH_SECRET);
+
+// Use token in API requests
+const response = await fetch('http://localhost:4000/api/v1/protected', {
+  headers: {
+    'Authorization': `Bearer ${token}`
+  }
+});
+```
+
+### Protected Pages
+- `/admin` - Admin dashboard (admin role required)
+- `/student` - Student dashboard (authenticated users)  
+- `/student/[username]` - Individual student pages (username match required)
 
 ---
 
