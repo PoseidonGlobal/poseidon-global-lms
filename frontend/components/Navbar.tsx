@@ -1,4 +1,5 @@
 import ActiveLink from './ActiveLink';
+import LoginToggle from './LoginToggle';
 
 export default function Navbar() {
   return (
@@ -11,6 +12,7 @@ export default function Navbar() {
           <ActiveLink href="/">Home</ActiveLink>
           <ActiveLink href="/courses">Courses</ActiveLink>
           <ActiveLink href="/about">About</ActiveLink>
+          <LoginToggle />
         </div>
       </div>
     </nav>
