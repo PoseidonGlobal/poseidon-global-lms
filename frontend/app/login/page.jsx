@@ -32,47 +32,54 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="mx-auto max-w-md px-4 py-10">
-      <h1 className="text-2xl font-bold">Log in</h1>
-      <form onSubmit={onSubmit} className="mt-6 space-y-4">
-        {err && (
-          <div className="rounded border border-red-200 bg-red-50 p-2 text-sm text-red-700">
-            {err}
+    <main className="mx-auto flex min-h-[70vh] max-w-md flex-col justify-center px-4 py-10">
+      <div className="surface-panel p-8 shadow-brand-glow">
+        <h1 className="text-3xl font-bold bg-gradient-to-r from-brand.accent via-brand.primary to-brand.accent bg-clip-text text-transparent">
+          Log in
+        </h1>
+        <form onSubmit={onSubmit} className="mt-8 space-y-5">
+          {err && (
+            <div className="rounded-md border border-red-400/40 bg-red-500/10 p-3 text-sm text-red-300">
+              {err}
+            </div>
+          )}
+          <div className="space-y-1.5">
+            <label className="block text-xs font-semibold uppercase tracking-wide text-text.muted">
+              Email
+            </label>
+            <input
+              type="email"
+              className="input"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              autoComplete="email"
+              placeholder="you@example.com"
+            />
           </div>
-        )}
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Email</label>
-          <input
-            type="email"
-            className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            autoComplete="email"
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Password</label>
-          <input
-            type="password"
-            className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            autoComplete="current-password"
-          />
-        </div>
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 disabled:opacity-60"
-        >
-          {loading ? 'Signing in...' : 'Log in'}
-        </button>
-        <p className="text-sm text-gray-600">
-          Demo accounts (seeded in Postgres): student1@example.com / password123, admin@example.com / admin1234
-        </p>
-      </form>
+          <div className="space-y-1.5">
+            <label className="block text-xs font-semibold uppercase tracking-wide text-text.muted">
+              Password
+            </label>
+            <input
+              type="password"
+              className="input"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              autoComplete="current-password"
+              placeholder="••••••••"
+            />
+          </div>
+          <button type="submit" disabled={loading} className="btn-primary w-full">
+            {loading ? 'Signing in...' : 'Log in'}
+          </button>
+          <p className="text-xs leading-relaxed text-text.muted">
+            Demo: student1@example.com / password123<br />
+            Admin: admin@example.com / admin1234
+          </p>
+        </form>
+      </div>
     </main>
   );
 }
